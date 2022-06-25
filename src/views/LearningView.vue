@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import {ref} from 'vue'
-import {Timer20Regular as TimeIcon, Save24Regular as SaveIcon, Delete20Regular as DeleteIcon} from '@vicons/fluent'
+import {computed, ref, watchEffect} from 'vue'
+import LearningItem from '@/components/LearningItem.vue'
+import type {RoadmapItem} from "@/interfaces/RoadmapItem";
 
 const options = [
   {
@@ -17,13 +18,56 @@ const options = [
   }
 ]
 
-const list1 = [
+const selectedValue = ref<string | null>(null);
+
+const content = ref<RoadmapItem[]>([
   {
-    title: "Introduction"
-  }
-];
-const selectedValue = ref<string|null>(null);
-const value = ref<number|null>(null);
+    id: "asbs",
+    name: "Html",
+    totalTime: 10,
+    watchedTime: 2,
+    videos: 3,
+    roadmapId: "wqeasd",
+    isOptional: false
+  },
+  {
+    id: "asbsasd",
+    name: "CSS",
+    totalTime: 12,
+    watchedTime: 1,
+    videos: 2,
+    roadmapId: "wqeasd",
+    isOptional: false
+  },
+  {
+    id: "asbsdasdas",
+    name: "JavaScript",
+    totalTime: 17,
+    watchedTime: 0,
+    videos: 5,
+    roadmapId: "wqeasd",
+    isOptional: false
+  },
+]);
+const totalHours = ref(0);
+const watchedHours = ref(0)
+watchEffect(() => content.value.forEach((item) => totalHours.value += item.totalTime))
+watchEffect(() => content.value.forEach((item) => watchedHours.value += (item?.watchedTime ?? 0)))
+const completedPercent = computed(() => Math.round(watchedHours.value * 100 / totalHours.value))
+
+const makeComplete = ({itemId, value}) => {
+  const item = content.value.find((i) => i.id === itemId)
+  if (!item) return
+  watchedHours.value = 0
+  item.watchedTime = (value) ? item.totalTime : 0;
+};
+
+const removeRoadmapItem = (itemId) => {
+  const item = content.value.find((item) => item.id === itemId)
+  if (!item) return
+  item.deleted = true
+}
+
 </script>
 
 <template>
@@ -53,58 +97,27 @@ const value = ref<number|null>(null);
         </template>
         <n-list bordered>
           <template #header>
-            <n-h3 class="mb-0">Learning: Android (34 Hours)</n-h3>
+            <n-h3 class="mb-0">Learning: Android ({{ totalHours }} Hours)</n-h3>
           </template>
+          <LearningItem v-for="item in content" :key="item.id" :item="item" @makeComplete="makeComplete"
+                        @removeItem="removeRoadmapItem"/>
           <template #footer>
-            fff
-          </template>
-          <n-list-item class="item-finished">
-            <template #prefix>
-              <n-checkbox></n-checkbox>
-            </template>
-            <n-thing justify="center" class="item-thing">
-              HTML &numsp; |&numsp; Videos: 2 &numsp; |&numsp; 76% Completed &numsp;|&numsp; 2 Hours Left
-            </n-thing>
-            <template #suffix>
-              <n-space class="list-suffex">
-                <n-tooltip :style="{ maxWidth: '400px' }" trigger="click">
-                  <template #trigger>
-                    <n-button strong secondary circle type="info">
-                      <template #icon>
-                        <n-icon>
-                          <time-icon/>
-                        </n-icon>
-                      </template>
-                    </n-button>
-                  </template>
-
-                  <n-space>
-                    <n-input-number
-                        v-model:value="value"
-                        placeholder="Enter watched time..."
-                        :min="0"
-                        :max="24"
-                    />
-                    <n-button quaternary circle type="primary">
-                      <template #icon>
-                        <n-icon>
-                          <save-icon/>
-                        </n-icon>
-                      </template>
-                    </n-button>
-
-                  </n-space>
-                </n-tooltip>
-                <n-button strong secondary circle type="info">
-                  <template #icon>
-                    <n-icon>
-                      <delete-icon/>
-                    </n-icon>
-                  </template>
+            <n-space justify="space-between" align="center">
+              <n-h6 class="mb-0">
+                <n-text :type="(completedPercent > 50) ? 'success' : 'error'">Total Hours Watched : {{
+                    watchedHours
+                  }} &numsp; |&numsp; Remaining Hours :
+                  {{ totalHours - watchedHours }}
+                  &numsp; |&numsp; Completed: {{ completedPercent }}%
+                </n-text>
+              </n-h6>
+              <n-space>
+                <n-button size="small" type="primary" round dashed>
+                  <n-text type="primary" strong>Save Changes</n-text>
                 </n-button>
               </n-space>
-            </template>
-          </n-list-item>
+            </n-space>
+          </template>
         </n-list>
       </n-card>
     </n-space>
@@ -123,7 +136,7 @@ const value = ref<number|null>(null);
   }
 }
 
-.list-suffex {
+.list-suffix {
   flex-flow: nowrap !important;
 }
 </style>
