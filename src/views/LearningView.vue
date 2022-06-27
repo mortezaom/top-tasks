@@ -1,7 +1,9 @@
 <script lang="ts" setup>
-import {computed, ref, watchEffect} from 'vue'
+import {ref} from 'vue'
 import LearningItem from '@/components/LearningItem.vue'
-import type {RoadmapItem} from "@/interfaces/RoadmapItem";
+import {useRoadmapStore} from "@/stores/roadmap";
+
+const roadmapStore = useRoadmapStore()
 
 const options = [
   {
@@ -19,73 +21,6 @@ const options = [
 ]
 
 const selectedValue = ref<string | null>(null);
-
-const content = ref<RoadmapItem[]>([
-  {
-    id: "asbs",
-    name: "Html",
-    learnTime: 10,
-    workTime: 2,
-    learnedTime: 2,
-    videos: 3,
-    roadmapId: "wqeasd",
-    deleted: false
-  },
-  {
-    id: "asbsasd",
-    name: "CSS",
-    learnTime: 12,
-    learnedTime: 1,
-    videos: 2,
-    roadmapId: "wqeasd",
-    deleted: false
-  },
-  {
-    id: "asbsdasdas",
-    name: "JavaScript",
-    learnTime: 17,
-    learnedTime: 0,
-    videos: 5,
-    roadmapId: "wqeasd",
-    deleted: false
-  },
-]);
-
-const totalHours = ref(0), watchedHours = ref(0), workHours = ref(0), workedHours = ref(0)
-watchEffect(() => content.value.forEach((item) => totalHours.value += item.learnTime))
-watchEffect(() => content.value.forEach((item) => watchedHours.value += (item?.learnedTime ?? 0)))
-watchEffect(() => content.value.forEach((item) => workHours.value += item?.workTime ?? 0))
-watchEffect(() => content.value.forEach((item) => workedHours.value += item?.workedTime ?? 0))
-const totalVideos = computed(() => content.value.map((item) => item.videos).reduce((a, b) => (a ?? 0) + (b ?? 0), 0))
-
-const makeComplete = ({itemId, value}) => {
-  const item = content.value.find((i) => i.id === itemId)
-  if (!item) return
-  watchedHours.value = 0
-  item.learnedTime = (value) ? item.learnTime : 0;
-};
-
-const addToWorked = ({itemId, value}) => {
-  const item = content.value.find((i) => i.id === itemId)
-  if (!item) return
-  workedHours.value = 0
-  console.log(item.workedTime ?? 0)
-  console.log(value)
-  item.workedTime = (item.workedTime ?? 0) + value
-}
-
-const addToLearned = ({itemId, value}) => {
-  const item = content.value.find((i) => i.id === itemId)
-  if (!item) return
-  watchedHours.value = 0
-  item.learnedTime = (item.learnedTime ?? 0) + value
-}
-
-const removeRoadmapItem = (itemId) => {
-  const item = content.value.find((item) => item.id === itemId)
-  if (!item) return
-  item.deleted = !item.deleted
-}
 
 </script>
 
@@ -116,22 +51,18 @@ const removeRoadmapItem = (itemId) => {
         </template>
         <n-list bordered>
           <template #header>
-            <n-h3 class="mb-0">Learning: Android ({{ totalHours }} Hours)</n-h3>
+            <n-h3 class="mb-0">Learning: Android ({{ roadmapStore.totalHours }} Hours)</n-h3>
           </template>
-          <LearningItem v-for="item in content" :key="item.id" :item="item"
-                        @makeComplete="makeComplete"
-                        @removeItem="removeRoadmapItem"
-                        @addToLearned="addToLearned"
-                        @addToWorked="addToWorked"
+          <LearningItem v-for="item in roadmapStore.rItems" :key="item.id" :item="item"
           />
           <template #footer>
             <n-space justify="space-between" align="center">
               <n-h6 class="mb-0">
-                <n-text :type="((workHours - workedHours) < (workHours/2)) ? 'success' : 'error'">Total Videos : {{
-                    totalVideos
+                <n-text :type="((roadmapStore.workHours - roadmapStore.workedHours) < (roadmapStore.workHours/2)) ? 'success' : 'error'">Total Videos : {{
+                    roadmapStore.totalVideos
                   }} &numsp; |&numsp; Remaining Learning Hours :
-                  {{ totalHours - watchedHours }}
-                  &numsp; |&numsp; Remaining Working Hours: {{ workHours - workedHours }}
+                  {{ roadmapStore.totalHours - roadmapStore.watchedHours }}
+                  &numsp; |&numsp; Remaining Working Hours: {{ roadmapStore.workHours - roadmapStore.workedHours }}
                 </n-text>
               </n-h6>
               <n-space>

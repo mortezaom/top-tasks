@@ -8,26 +8,22 @@ import {
 } from '@vicons/fluent'
 import {computed, ref} from "vue";
 import type {RoadmapItem} from "@/interfaces/RoadmapItem";
+import {useRoadmapStore} from "@/stores/roadmap";
+
+const roadmapStore = useRoadmapStore()
 
 const learned = ref<number>(0);
 const worked = ref<number>(0);
+const {item} = defineProps<{ item: RoadmapItem }>()
 
-const {item} = defineProps<{
-  item: RoadmapItem
-}>()
-const emits = defineEmits(['makeComplete', 'removeItem', 'addToLearned', 'addToWorked'])
-
-const handleAddToLearned = () => emits('addToLearned', {itemId: item.id, value: learned.value})
-
-const handleAddToWorked = () => {
-  emits('addToWorked', {itemId: item.id, value: worked.value})
-}
+const handleAddToLearned = () => roadmapStore.addToLearned({itemId: item.id, value: learned.value})
+const handleAddToWorked = () => roadmapStore.addToWorked({itemId: item.id, value: worked.value})
+const handleCheckedChange = (value: boolean) => roadmapStore.makeComplete({itemId: item.id, value})
+const handleRemoveItem = () => roadmapStore.removeRoadmapItem(item.id)
 
 const remainingLearnHours = computed(() => (item.learnTime ?? 0) - (item.learnedTime ?? 0))
 const remainingWorkHours = computed(() => (item.workTime ?? 0) - (item.workedTime ?? 0))
 
-const handleCheckedChange = (value: boolean) => emits('makeComplete', {itemId: item.id, value})
-const handleRemoveItem = () => emits('removeItem', item.id)
 </script>
 
 
@@ -60,7 +56,7 @@ const handleRemoveItem = () => emits('removeItem', item.id)
             <n-input-number
                 v-model:value="worked"
                 placeholder="Enter worked time..."
-                :min="0"
+                :min=" item?.workedTime - item?.workTime"
                 :max="item?.workTime - item?.workedTime"
             />
             <n-button quaternary circle type="primary" @click="handleAddToWorked" :disabled="(item.deleted ?? true)">
@@ -88,7 +84,7 @@ const handleRemoveItem = () => emits('removeItem', item.id)
             <n-input-number
                 v-model:value="learned"
                 placeholder="Enter watched time..."
-                :min="0"
+                :min="item?.learnedTime - item?.learnTime"
                 :max="item?.learnTime - item?.learnedTime"
             />
             <n-button quaternary circle type="primary" @click="handleAddToLearned" :disabled="(item.deleted ?? true)">
@@ -105,7 +101,7 @@ const handleRemoveItem = () => emits('removeItem', item.id)
           <template #icon>
             <n-icon>
               <delete-icon v-if="!(item?.deleted ?? false)"/>
-              <undo-icon v-else />
+              <undo-icon v-else/>
             </n-icon>
           </template>
         </n-button>
@@ -115,6 +111,4 @@ const handleRemoveItem = () => emits('removeItem', item.id)
 </template>
 
 <style lang="scss">
-.disable {
-}
 </style>
