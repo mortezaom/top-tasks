@@ -1,8 +1,10 @@
 interface RoadmapItem {
     id: string,
     name: string,
-    totalTime: number,
-    watchedTime?: number,
+    learnTime: number,
+    learnedTime?: number,
+    workTime? : number,
+    workedTime? : number,
     videos?: number,
     roadmapId: string,
     isOptional?: boolean,
