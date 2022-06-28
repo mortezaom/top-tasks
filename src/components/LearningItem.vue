@@ -56,8 +56,8 @@ const remainingWorkHours = computed(() => (item.workTime ?? 0) - (item.workedTim
             <n-input-number
                 v-model:value="worked"
                 placeholder="Enter worked time..."
-                :min=" item?.workedTime - item?.workTime"
-                :max="item?.workTime - item?.workedTime"
+                :min=" (item?.workedTime ?? 0) - (item?.workTime ?? 0)"
+                :max="(item?.workTime ?? 0) - (item?.workedTime ?? 0)"
             />
             <n-button quaternary circle type="primary" @click="handleAddToWorked" :disabled="(item.deleted ?? true)">
               <template #icon>
@@ -84,8 +84,8 @@ const remainingWorkHours = computed(() => (item.workTime ?? 0) - (item.workedTim
             <n-input-number
                 v-model:value="learned"
                 placeholder="Enter watched time..."
-                :min="item?.learnedTime - item?.learnTime"
-                :max="item?.learnTime - item?.learnedTime"
+                :min="(item?.learnedTime ?? 0) - (item?.learnTime ?? 0)"
+                :max="(item?.learnTime ?? 0) - (item?.learnedTime ?? 0)"
             />
             <n-button quaternary circle type="primary" @click="handleAddToLearned" :disabled="(item.deleted ?? true)">
               <template #icon>

@@ -14,6 +14,9 @@ const router = useRouter()
 
 const path = computed(() => route.path);
 const breadcrumbs = ref<string[]>([])
+
+const capitalize = (text: string) =>  text.charAt(0).toUpperCase() + text.slice(1)
+
 watch(path, (newVal) => {
     breadcrumbs.value = newVal.split('/').filter((t) => t != '')
 })
@@ -35,7 +38,7 @@ let value = ref(0)
                 </n-button>
                 <n-breadcrumb>
                     <n-breadcrumb-item> Dashboard</n-breadcrumb-item>
-                    <n-breadcrumb-item v-for="item in breadcrumbs"> {{ item.capitalize() }}</n-breadcrumb-item>
+                    <n-breadcrumb-item v-for="item in breadcrumbs"> {{ capitalize(item) }}</n-breadcrumb-item>
                 </n-breadcrumb>
             </n-space>
             <n-space align="center">

@@ -7,6 +7,7 @@ import {
     LearningApp20Regular as LearningIcon,
     TaskListSquareRtl24Regular as TasksIcon
 } from "@vicons/fluent"
+
 const route = useRoute()
 const router = useRouter()
 
