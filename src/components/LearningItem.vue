@@ -15,11 +15,10 @@ const roadmapStore = useRoadmapStore()
 const learned = ref<number>(0);
 const worked = ref<number>(0);
 const {item} = defineProps<{ item: RoadmapItem }>()
-
-const handleAddToLearned = () => roadmapStore.addToLearned({itemId: item.id, value: learned.value})
-const handleAddToWorked = () => roadmapStore.addToWorked({itemId: item.id, value: worked.value})
-const handleCheckedChange = (value: boolean) => roadmapStore.makeComplete({itemId: item.id, value})
-const handleRemoveItem = () => roadmapStore.removeRoadmapItem(item.id)
+const handleAddToLearned = () => roadmapStore.addToLearned({itemId: item._id, value: learned.value})
+const handleAddToWorked = () => roadmapStore.addToWorked({itemId: item._id, value: worked.value})
+const handleCheckedChange = (value: boolean) => roadmapStore.makeComplete({itemId: item._id, value})
+const handleRemoveItem = () => roadmapStore.removeRoadmapItem(item._id)
 
 const remainingLearnHours = computed(() => (item.learnTime ?? 0) - (item.learnedTime ?? 0))
 const remainingWorkHours = computed(() => (item.workTime ?? 0) - (item.workedTime ?? 0))

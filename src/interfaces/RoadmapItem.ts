@@ -1,5 +1,5 @@
 interface RoadmapItem {
-    id: string,
+    _id: string,
     name: string,
     learnTime: number,
     learnedTime?: number,

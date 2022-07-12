@@ -1,34 +1,17 @@
-<script setup lang="ts">
-import { darkTheme } from "naive-ui";
-import SideBar from "./components/SideBar.vue";
-import TopBar from "./components/TopBar.vue";
-
-</script>
-
 <template>
   <n-config-provider :theme="darkTheme">
-    <n-message-provider>
-      <n-space vertical>
-        <n-layout>
-          <n-layout has-sider>
-            <side-bar />
-            <n-layout style="min-height: 100vh">
-              <top-bar />
-              <div class="content-con">
-                <RouterView />
-              </div>
-            </n-layout>
-          </n-layout>
-        </n-layout>
-      </n-space>
-    </n-message-provider>
+    <n-dialog-provider>
+      <n-message-provider>
+        <RouterView/>
+      </n-message-provider>
+    </n-dialog-provider>
   </n-config-provider>
 </template>
 
+<script lang="ts" setup>
+import {darkTheme} from "naive-ui";
+</script>
+
 <style>
 @import '@/assets/base.css';
-
-.content-con {
-  padding: 24px 36px;
-}
 </style>

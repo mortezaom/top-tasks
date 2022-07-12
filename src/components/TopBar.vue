@@ -15,11 +15,16 @@ const router = useRouter()
 const path = computed(() => route.path);
 const breadcrumbs = ref<string[]>([])
 
-const capitalize = (text: string) =>  text.charAt(0).toUpperCase() + text.slice(1)
+const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 
 watch(path, (newVal) => {
     breadcrumbs.value = newVal.split('/').filter((t) => t != '')
 })
+
+const handleLogout = () => {
+    localStorage.removeItem("user")
+    router.push("/auth")
+}
 
 let isSync = ref(true)
 let value = ref(0)
@@ -59,7 +64,7 @@ let value = ref(0)
                         </template>
                     </n-button>
                 </n-badge>
-                <n-button strong secondary circle type="error">
+                <n-button strong secondary circle type="error" @click="handleLogout">
                     <template #icon>
                         <n-icon>
                             <logout-icon />
