@@ -1,9 +1,9 @@
 import type {RoadmapItem} from "@/interfaces/RoadmapItem";
 
 interface Roadmap {
-    _id: string,
+    _id?: string,
     name: string,
-    userId: string,
+    userId?: string,
     items: RoadmapItem[]
 }
 

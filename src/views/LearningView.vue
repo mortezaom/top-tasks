@@ -1,30 +1,34 @@
 <script lang="ts" setup>
 import {onMounted, ref, computed, watchEffect, watch} from 'vue'
-import { storeToRefs } from 'pinia'
+import {storeToRefs} from 'pinia'
 import LearningItem from '@/components/LearningItem.vue'
 import {useRoadmapStore} from "@/stores/roadmap";
 import {Rename20Regular as NameIcon} from '@vicons/fluent'
 
 const roadmapStore = useRoadmapStore()
-const { myRoadmaps } = storeToRefs(roadmapStore)
+const {myRoadmaps} = storeToRefs(roadmapStore)
 onMounted(() => {
   roadmapStore.fetchAllRoadmaps()
   roadmapStore.fetchMyRoadmaps()
 })
 
-const selectedPreRoad = ref<string | null>(null)
-
-const selectedRoadmap = ref<string | null>(null);
-
-const createModal = ref<boolean>(false)
+const createCustomModal = ref<boolean>(false)
 const bodyStyle = {
   width: '700px'
 }
 const loading = ref(false)
-const selectedValues = ref<string | null>(null)
 
-const roadName = ref('')
+const newRoad = ref<{ name: string, items: any[] }>({name: '', items: []})
+const addNewItem = () => newRoad.value.items.push({name: '', videos: 1, learnTime: 0})
 
+const submitRoad = async () => {
+  await roadmapStore.createNewRoadmap(newRoad.value)
+  createCustomModal.value = false
+}
+const deleteLastItem = () => newRoad.value.items.pop()
+
+const submitRule = computed(() => newRoad.value.name != '' &&
+    newRoad.value.items.length > 0 && newRoad.value.items[0].name != '')
 
 </script>
 
@@ -32,11 +36,8 @@ const roadName = ref('')
   <div class="about">
     <n-space vertical>
       <n-space align="center">
-        <n-button strong secondary round type="success" @click="createModal = true">
+        <n-button strong secondary round type="success" @click="createCustomModal = true">
           Create Roadmap
-        </n-button>
-        <n-button strong secondary round type="success">
-          Create Roadmap (Custom)
         </n-button>
         <n-select
             filterable
@@ -62,7 +63,7 @@ const roadName = ref('')
                 <n-text type="warning" strong>Please Select a Roadmap first</n-text>
               </n-h3>
             </n-space>
-            <n-h3 v-else class="mb-0">Learning: Android ({{ roadmapStore.totalHours }} Hours)</n-h3>
+            <n-h3 v-else class="mb-0">{{ roadmapStore.sRoadmap.name }} ({{ roadmapStore.totalHours }} Hours)</n-h3>
           </template>
           <LearningItem v-for="item in roadmapStore.sRoadmap?.items ?? []" :key="item.id" :item="item"
           />
@@ -79,7 +80,7 @@ const roadName = ref('')
                 </n-text>
               </n-h6>
               <n-space>
-                <n-button size="small" type="primary" round dashed>
+                <n-button size="small" type="primary" round dashed @click="roadmapStore.setRoadmapItems">
                   <n-text type="primary" strong>Save Changes</n-text>
                 </n-button>
               </n-space>
@@ -91,45 +92,38 @@ const roadName = ref('')
   </div>
 
   <n-modal
-      v-model:show="createModal"
+      v-model:show="createCustomModal"
       class="custom-card"
       preset="card"
       :style="bodyStyle"
-      title="Create Roadmap"
+      title="Create Custom Roadmap"
       :bordered="true"
       size="huge"
   >
-    <n-h4>
-      <n-text strong>Choose template</n-text>
-    </n-h4>
-    <n-select
-        v-model:value="selectedValues"
-        filterable
-        placeholder="Search for roadmap"
-        :options="options"
-        :loading="loading"
-        clearable
-        remote
-        :clear-filter-after-select="false"
-        @search="handleSearch"
-    />
-    <n-h3 v-if="selectedItem == null">
-      <n-text type="error" strong>Nothing selected</n-text>
-    </n-h3>
-    <n-list bordered style="margin: 16px auto">
-      <n-list-item v-for="item in (selectedPreRoad?.items ?? [])" :key="item.id">
-        <n-text>
-          {{ item.name }} &numsp; |&numsp; Videos: {{ item.videos }} &numsp; |&numsp; Time: {{ item.learnTime }}
-        </n-text>
-      </n-list-item>
-    </n-list>
-    <n-input placeholder="Enter Name ( Blank for parent name )" style="margin-bottom: 16px" v-model:value="roadName">
+    <n-input placeholder="Enter Name" style="margin-bottom: 16px" v-model:value="newRoad.name">
       <template #prefix>
         <n-icon :component="NameIcon"/>
       </template>
     </n-input>
+    <n-list bordered>
+      <template #footer>
+        <n-space justify="end">
+          <n-button type="error" dashed @click="deleteLastItem">Delete Last</n-button>
+          <n-button type="success" dashed @click="addNewItem">Add Another</n-button>
+        </n-space>
+      </template>
+      <n-list-item v-for="item in newRoad.items">
+        <n-input-group>
+          <n-input v-model:value="item.name" :style="{ width: '50%' }" placeholder="Enter the Name"/>
+          <n-input-number :min="1" v-model:value="item.videos" :style="{ width: '25%' }" placeholder="Videos"/>
+          <n-input-number :min="0" v-model:value="item.learnTime" :style="{ width: '25%' }" placeholder="Duration"/>
+        </n-input-group>
+      </n-list-item>
+    </n-list>
 
-    <n-button :disabled="selectedPreRoad==null" type="success">Submit</n-button>
+    <br>
+
+    <n-button :disabled="!submitRule" type="success" @click="submitRoad">Submit</n-button>
 
   </n-modal>
 </template>

@@ -81,12 +81,31 @@ export const useRoadmapStore = defineStore({
                 this.error = error.value
             }
         },
-        async setRoadmapItems(roadmap: Roadmap) {
-            const {error, data} = await useApi(`/api/v1/roadmaps/${roadmap._id}`).put().json()
+        async setRoadmapItems() {
+            const roadmap = this.selectedRoadmap!
+            console.log(roadmap)
+            const {
+                error,
+                data
+            } = await useApi(`/api/v1/roadmaps/${roadmap._id}`).put({data: JSON.stringify(roadmap)}).json()
             if (error.value == null) {
+                console.log(data)
                 this.allRoadmaps.map((e) => e._id != roadmap._id ? e : data)
                 this.myRoadmaps.map((e) => e._id != roadmap._id ? e : data)
                 this.selectedRoadmap = data.value
+            } else {
+                this.error = error.value
+            }
+        },
+        async createNewRoadmap(roadmap: Roadmap) {
+            const {
+                error,
+                data
+            } = await useApi(`/api/v1/roadmaps/`).post({data: JSON.stringify(roadmap)}).json()
+            if (error.value == null) {
+                console.log(data)
+                this.allRoadmaps.push(data.value)
+                this.myRoadmaps.push(data.value)
             } else {
                 this.error = error.value
             }
