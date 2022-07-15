@@ -55,6 +55,7 @@ const menuOptions: MenuOption[] = [
         ],
     },
 ]
+
 const path = computed(() => route.path);
 
 </script>
