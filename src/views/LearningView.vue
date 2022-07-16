@@ -13,6 +13,7 @@ onMounted(() => {
 })
 
 const createCustomModal = ref<boolean>(false)
+const editCurrentModal = ref(false)
 const bodyStyle = {
   width: '700px'
 }
@@ -26,6 +27,7 @@ const submitRoad = async () => {
   createCustomModal.value = false
 }
 const deleteLastItem = () => newRoad.value.items.pop()
+const editValid = computed(() => roadmapStore.selectedRoadmap == null)
 
 const submitRule = computed(() => newRoad.value.name != '' &&
     newRoad.value.items.length > 0 && newRoad.value.items[0].name != '')
@@ -38,6 +40,9 @@ const submitRule = computed(() => newRoad.value.name != '' &&
       <n-space align="center">
         <n-button strong secondary round type="success" @click="createCustomModal = true">
           Create Roadmap
+        </n-button>
+        <n-button strong secondary round type="info" :disabled="editValid">
+          Edit Current Roadmap
         </n-button>
         <n-select
             filterable
@@ -124,6 +129,42 @@ const submitRule = computed(() => newRoad.value.name != '' &&
     <br>
 
     <n-button :disabled="!submitRule" type="success" @click="submitRoad">Submit</n-button>
+
+  </n-modal>
+
+  <n-modal
+      v-model:show="editCurrentModal"
+      class="custom-card"
+      preset="card"
+      :style="bodyStyle"
+      title="Create Custom Roadmap"
+      :bordered="true"
+      size="huge"
+  >
+    <n-input placeholder="Enter Name" style="margin-bottom: 16px" v-model:value="newRoad.name">
+      <template #prefix>
+        <n-icon :component="NameIcon"/>
+      </template>
+    </n-input>
+    <n-list bordered>
+      <template #footer>
+        <n-space justify="end">
+          <n-button type="error" dashed @click="deleteLastItem">Delete Last</n-button>
+          <n-button type="success" dashed @click="addNewItem">Add Another</n-button>
+        </n-space>
+      </template>
+      <n-list-item v-for="item in newRoad.items">
+        <n-input-group>
+          <n-input v-model:value="item.name" :style="{ width: '50%' }" placeholder="Enter the Name"/>
+          <n-input-number :min="1" v-model:value="item.videos" :style="{ width: '25%' }" placeholder="Videos"/>
+          <n-input-number :min="0" v-model:value="item.learnTime" :style="{ width: '25%' }" placeholder="Duration"/>
+        </n-input-group>
+      </n-list-item>
+    </n-list>
+
+    <br>
+
+    <n-button type="success" @click="editRoad">Submit</n-button>
 
   </n-modal>
 </template>
