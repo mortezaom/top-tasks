@@ -21,7 +21,7 @@ export default defineConfig({
     server: {
         proxy: {
             '/api': {
-                target: 'http://localhost:4444/api/',
+                target: 'http://mortezaom.me:4444/api/',
                 changeOrigin: true,
                 rewrite: path => path.replace('/api', ''),
             }
@@ -30,6 +30,33 @@ export default defineConfig({
     build: {
         target: 'es2015',
         cssTarget: 'chrome80',
+        build: {
+
+            outDir: '../dist',
+            emptyOutDir: true,
+
+            minify: 'terser',
+            terserOptions: {
+                compress: {
+                    drop_console: false,
+                    drop_debugger: false,
+                },
+                format: {
+                    comments: false
+                },
+            },
+            sourcemap: true,
+
+            rollupOptions: {
+                plugins: [
+                    visualizer({
+                        filename: resolve(__dirname, 'stats.html'),
+                        template: 'treemap',
+                    }),
+                ],
+            },
+
+        },
         // minify: 'terser',
         /**
          * 当 minify=“minify:'terser'” 解开注释
