@@ -1,16 +1,16 @@
-import {createFetch} from "@vueuse/core";
+import { createFetch } from "@vueuse/core";
 
 const useApi = createFetch({
-    baseUrl: 'http://mortezaom.me:4444',
+    baseUrl: 'http://mortezaom.me:5000',
     options: {
-        async beforeFetch({options, cancel}) {
+        async beforeFetch({ options, cancel }) {
             const token = JSON.parse(localStorage.getItem('user') ?? '')['token']
             if (!token) cancel()
             options.headers = {
                 ...options.headers,
                 Authorization: `${token}`,
             }
-            return {options}
+            return { options }
         },
     },
     fetchOptions: {
