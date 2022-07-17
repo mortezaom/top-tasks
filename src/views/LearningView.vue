@@ -70,7 +70,7 @@ const submitRule = computed(() => newRoad.value.name != '' &&
             </n-space>
             <n-h3 v-else class="mb-0">{{ roadmapStore.sRoadmap.name }} ({{ roadmapStore.totalHours }} Hours)</n-h3>
           </template>
-          <LearningItem v-for="item in roadmapStore.sRoadmap?.items ?? []" :key="item.id" :item="item"
+          <LearningItem v-for="item in roadmapStore.sRoadmap?.items ?? []" :key="item._id" :item="item"
           />
           <template #footer v-if="roadmapStore.sRoadmap != null">
             <n-space justify="space-between" align="center">
@@ -164,7 +164,7 @@ const submitRule = computed(() => newRoad.value.name != '' &&
 
     <br>
 
-    <n-button type="success" @click="editRoad">Submit</n-button>
+    <n-button type="success">Submit</n-button>
 
   </n-modal>
 </template>
